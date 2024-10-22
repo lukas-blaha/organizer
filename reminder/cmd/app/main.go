@@ -32,6 +32,8 @@ func main() {
 
 	app.loadSavedData()
 
+	go app.Cron()
+
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),

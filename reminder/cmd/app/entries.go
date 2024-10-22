@@ -14,9 +14,10 @@ type Entry struct {
 	Start    string `json:"start"`
 	Repeat   int    `json:"repeat"`
 	Next     string `json:"next"`
+	Last     string `json:"last"`
 	Category string `json:"category"`
 	User     string `json:"user"`
-	Done     bool   `json:"done"`
+	Done     bool   `json:"-"`
 }
 
 type Entries []Entry
@@ -25,7 +26,7 @@ func (app *Config) loadSavedData() error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `SELECT id, start, repeat, next, category, name, done FROM reminders`
+	query := `SELECT id, start, repeat, last, category, name FROM reminders`
 
 	log.Println("Loading data...")
 
@@ -41,15 +42,17 @@ func (app *Config) loadSavedData() error {
 			&entry.Id,
 			&entry.Start,
 			&entry.Repeat,
-			&entry.Next,
+			&entry.Last,
 			&entry.Category,
 			&entry.User,
-			&entry.Done,
 		)
 		if err != nil {
 			log.Println("Error scanning", err)
 			return err
 		}
+
+		entry.Done = false
+		entry.Next = entry.GetNextTime()
 
 		fmt.Println("Entry: ", entry)
 		app.Reminders = append(app.Reminders, entry)
@@ -63,9 +66,9 @@ func (app *Config) writeToDB(e Entry) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `INSERT INTO reminders (id, start, repeat, next, category, name, done) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	query := `INSERT INTO reminders (id, start, repeat, last, category, name) VALUES ($1, $2, $3, $4, $5, $6)`
 
-	_, err := app.DB.ExecContext(ctx, query, e.Id, e.Start, e.Repeat, e.Next, e.Category, e.User, e.Done)
+	_, err := app.DB.ExecContext(ctx, query, e.Id, e.Start, e.Repeat, e.Last, e.Category, e.User)
 	if err != nil {
 		return err
 	}
@@ -85,5 +88,6 @@ func (app *Config) removeFromDB(e Entry) error {
 		return err
 	}
 
+	log.Printf("Reminder #%d removed!\n", e.Id)
 	return nil
 }

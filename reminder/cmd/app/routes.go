@@ -39,18 +39,34 @@ func (app *Config) CreateReminder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	entry.Id = app.GetNextId()
+	entry.Next = entry.GetNextTime()
+
 	app.Reminders = append(app.Reminders, entry)
 	err = app.writeToDB(entry)
 	if err != nil {
 		log.Print(err)
+		return
 	}
+
+	fmt.Fprintf(w, "New reminder #%d added.\n", entry.Id)
 }
 
 func (app *Config) ListReminders(w http.ResponseWriter, r *http.Request) {
+	var output string
 	for _, reminder := range app.Reminders {
-		fmt.Fprintf(w, `id: %d, user: %s, start: "%s", repeat: "%d min", next: "%s", categary: "%s", done: "%v"`, reminder.Id, reminder.User, reminder.Start, reminder.Repeat, reminder.Next, reminder.Category, reminder.Done)
-		fmt.Fprintln(w, "")
+		b, err := json.Marshal(reminder)
+		if err != nil {
+			log.Print(err)
+		}
+		if len(output) != 0 {
+			output = output + "," + string(b)
+		} else {
+			output = string(b)
+		}
 	}
+
+	fmt.Fprintln(w, "["+output+"]")
 }
 
 func (app *Config) CheckExistance(e Entry) bool {
@@ -73,7 +89,12 @@ func (app *Config) RemoveReminder(w http.ResponseWriter, r *http.Request) {
 	for i, reminder := range app.Reminders {
 		if reminder.Id == id {
 			app.Reminders = append(app.Reminders[:i], app.Reminders[i+1:]...)
-			app.removeFromDB(reminder)
+			err = app.removeFromDB(reminder)
+			if err != nil {
+				log.Print(err)
+				return
+			}
+			fmt.Fprintf(w, "Reminder #%d removed!\n", id)
 		}
 	}
 }
