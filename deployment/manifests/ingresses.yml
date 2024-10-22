@@ -1,0 +1,64 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: backend-http
+  namespace: organizer
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: "Host(`organizer.fikos.cz`) && PathPrefix(`/backend`)"
+    services:
+    - name: backend
+      port: 8080
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: backend-https
+  namespace: organizer
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: "Host(`organizer.fikos.cz`) && PathPrefix(`/backend`)"
+    services:
+    - name: backend
+      port: 8080
+  tls:
+    secretName: tls-secret
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: reminder-http
+  namespace: organizer
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: "Host(`organizer.fikos.cz`) && PathPrefix(`/reminders`)"
+    services:
+    - name: reminder
+      port: 8080
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: reminder-https
+  namespace: organizer
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: "Host(`organizer.fikos.cz`) && PathPrefix(`/reminders`)"
+    services:
+    - name: reminder
+      port: 8080
+  tls:
+    secretName: tls-secret
