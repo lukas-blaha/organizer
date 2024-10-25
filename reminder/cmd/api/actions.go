@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -26,19 +27,26 @@ func (app *Config) Cron() {
 }
 
 func (e *Entry) ActionByCategory() {
+	var addr string
 	var url string
 
 	if strings.ToLower(e.Category) == "workout" {
-		if strings.ToLower(e.User) == "lukas" {
-			url = "http://backend:8080/workout"
+		addr = os.Getenv("WORKOUT_URL")
 
-			_, err := http.Post(url, "text/plain", bytes.NewBuffer([]byte(`{"exercise": "pushups", "count": 0}`)))
-			if err != nil {
-				log.Print(err)
-			}
-
-			time.Sleep(time.Second)
+		if addr[len(addr)-1] == '/' {
+			url = addr + "workout"
+		} else {
+			url = addr + "/workout"
 		}
+
+		url += fmt.Sprintf("/%s", strings.ToLower(e.User))
+
+		_, err := http.Post(url, "text/plain", bytes.NewBuffer([]byte("all")))
+		if err != nil {
+			log.Print(err)
+		}
+
+		time.Sleep(time.Second)
 	}
 
 }

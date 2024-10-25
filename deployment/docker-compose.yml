@@ -11,13 +11,28 @@ services:
       mode: replicated
       replicas: 1
 
+  workout:
+    build:
+      context: ../workout
+    restart: always
+    ports:
+      - "8081:8080"
+    deploy:
+      mode: replicated
+      replicas: 1
+
   reminder:
     build:
       context: ../reminder
     restart: always
+    ports:
+      - "8082:8080"
     deploy:
       mode: replicated
       replicas: 1
+    environment:
+      DSN: "postgres://postgres:postgres@postgres:5432/organizer?sslmode=disable"
+      WORKOUT_URL: "http://workout:8080/"
 
   postgres:
     image: postgres:latest

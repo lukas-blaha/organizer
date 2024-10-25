@@ -35,7 +35,6 @@ spec:
       - name: postgres-data
         hostPath:
           path: /organizer/db/
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -77,6 +76,31 @@ spec:
       containers:
       - name: reminder
         image: lukasblaha/organizer-reminder:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DSN
+          value: "postgres://postgres:postgres@postgres:5432/organizer?sslmode=disable"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workout
+  namespace: organizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: workout
+  template:
+    metadata:
+      labels:
+        app: workout
+    spec:
+      containers:
+      - name: workout
+        image: lukasblaha/organizer-workout:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
