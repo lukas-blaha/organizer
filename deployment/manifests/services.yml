@@ -15,11 +15,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: notifier
   namespace: organizer
 spec:
   selector:
-    app: backend
+    app: notifier
   ports:
     - protocol: TCP
       port: 8080

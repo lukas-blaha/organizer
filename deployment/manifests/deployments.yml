@@ -40,21 +40,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: notifier
   namespace: organizer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: notifier
   template:
     metadata:
       labels:
-        app: backend
+        app: notifier
     spec:
       containers:
-      - name: backend
-        image: lukasblaha/organizer-backend:latest
+      - name: notifier
+        image: lukasblaha/organizer-notifier:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
