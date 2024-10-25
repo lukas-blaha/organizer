@@ -6,7 +6,7 @@ COPY . /app
 
 WORKDIR /app
 
-RUN CGO_ENABLED=0 go build -o reminderApp ./cmd/app
+RUN CGO_ENABLED=0 go build -o reminderApp ./cmd/api
 
 RUN chmod +x /app/reminderApp
 
