@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-  backend:
+  notifier:
     build:
-      context: ../backend
+      context: ../notifier
     restart: always
     ports:
       - "8080:8080"

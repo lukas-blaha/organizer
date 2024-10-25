@@ -19,7 +19,7 @@ down:
 
 build:
 	@echo "Building organizer images"
-	cd ../backend && docker build --platform linux/arm64 -t lukasblaha/organizer-backend:latest --push .
+	cd ../notifier && docker build --platform linux/arm64 -t lukasblaha/organizer-notifier:latest --push .
 	cd ../reminder && docker build --platform linux/arm64 -t lukasblaha/organizer-reminder:latest --push .
 	@echo "All images built and published"
 
@@ -31,7 +31,7 @@ deploy: build
 		$(shell kubectl get pods \
 			-n organizer \
 			-o name \
-			-l app=backend \
+			-l app=notifier \
 			--kubeconfig=/Users/lukas/.kube/home-env.config) \
 		$(shell kubectl get pods \
 			-n organizer \
